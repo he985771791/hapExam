@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.he.order.mapper.CustomersMapper">
+    <resultMap id="BaseResultMap" type="com.he.order.dto.Customers">
+        <result column="CUSTOMER_ID" property="customerId" jdbcType="DECIMAL" />
+        <result column="CUSTOMER_NUMBER" property="customerNumber" jdbcType="VARCHAR" />
+        <result column="CUSTOMER_NAME" property="customerName" jdbcType="VARCHAR" />
+        <result column="COMPANY_ID" property="companyId" jdbcType="DECIMAL" />
+        <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+    </resultMap>
+    <select id="lovCustomers" parameterType="com.he.order.dto.Customers" resultMap="BaseResultMap">
+        select CUSTOMER_ID,CUSTOMER_NUMBER,CUSTOMER_NAME,COMPANY_ID,ENABLED_FLAG from HAP_AR_CUSTOMERS
+        <where>
+            <if test="customerNumber != null">
+                and CUSTOMER_NUMBER like concat(concat('%',UPPER(#{customerNumber,jdbcType=VARCHAR})),'%')
+            </if>
+            <if test="customerName != null">
+                and CUSTOMER_NAME like concat(concat('%',UPPER(#{customerName,jdbcType=VARCHAR})),'%')
+            </if>
+            <if test="companyId != null">
+                and COMPANY_ID = #{companyId,jdbcType=DECIMAL}
+            </if>
+        </where>
+    </select>
+    <select id="lovCustomersForOrderLines" parameterType="com.he.order.dto.Customers" resultMap="BaseResultMap">
+        select CUSTOMER_ID,CUSTOMER_NUMBER,CUSTOMER_NAME,COMPANY_ID,ENABLED_FLAG from HAP_AR_CUSTOMERS
+        where ENABLED_FLAG='Y'
+            <if test="customerNumber != null">
+                and CUSTOMER_NUMBER like concat(concat('%',UPPER(#{customerNumber,jdbcType=VARCHAR})),'%')
+            </if>
+            <if test="customerName != null">
+                and CUSTOMER_NAME like concat(concat('%',UPPER(#{customerName,jdbcType=VARCHAR})),'%')
+            </if>
+            <if test="companyId != null">
+                and COMPANY_ID = #{companyId,jdbcType=DECIMAL}
+            </if>
+    </select>
+</mapper>

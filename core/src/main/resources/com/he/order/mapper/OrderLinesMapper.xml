@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.he.order.mapper.OrderLinesMapper">
+    <resultMap id="BaseResultMap" type="com.he.order.dto.OrderLines">
+        <result column="LINE_ID" property="lineId" jdbcType="DECIMAL" />
+        <result column="HEADER_ID" property="headerId" jdbcType="DECIMAL" />
+        <result column="LINE_NUMBER" property="lineNumber" jdbcType="DECIMAL" />
+        <result column="INVENTORY_ITEM_ID" property="inventoryItemId" jdbcType="DECIMAL" />
+        <result column="ORDERD_QUANTITY" property="orderdQuantity" jdbcType="DECIMAL" />
+        <result column="ORDER_QUANTITY_UOM" property="orderQuantityUom" jdbcType="VARCHAR" />
+        <result column="UNIT_SELLING_PRICE" property="unitSellingPrice" jdbcType="DECIMAL" />
+        <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+        <result column="COMPANY_ID" property="companyId" jdbcType="DECIMAL" />
+        <result column="ADDITION1" property="addition1" jdbcType="VARCHAR" />
+        <result column="ADDITION2" property="addition2" jdbcType="VARCHAR" />
+        <result column="ADDITION3" property="addition3" jdbcType="VARCHAR" />
+        <result column="ADDITION4" property="addition4" jdbcType="VARCHAR" />
+        <result column="ADDITION5" property="addition5" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="orderDetails" parameterType="com.he.order.dto.OrderLines" resultMap="BaseResultMap">
+        SELECT
+        l.LINE_ID as lineId,
+        l.HEADER_ID as headerId,
+        l.LINE_NUMBER as lineNumber,
+        inv.ITEM_CODE as ITEMCODE,
+        inv.ITEM_DESCRIPTION as ITEMDESCRIPTION,
+        inv.ITEM_UOM as ORDERQUANTITYUOM,
+        l.ORDERD_QUANTITY as ORDERDQUANTITY,
+        l.UNIT_SELLING_PRICE as UNITSELLINGPRICE ,
+        l.ORDERD_QUANTITY * l.UNIT_SELLING_PRICE AS SUMPRICE,
+        l.INVENTORY_ITEM_ID as INVENTORYITEMID,
+        l.DESCRIPTION,
+        l.COMPANY_ID,
+        ADDITION1,
+        ADDITION2,
+        ADDITION3,
+        ADDITION4,
+        ADDITION5
+        FROM
+        hap_om_order_lines l,
+        hap_inv_inventory_items inv
+        WHERE
+        l.INVENTORY_ITEM_ID = inv.INVENTORY_ITEM_ID
+        <if test="headerId != null">
+            and l.HEADER_ID = #{headerId}
+        </if>
+    </select>
+
+
+</mapper>

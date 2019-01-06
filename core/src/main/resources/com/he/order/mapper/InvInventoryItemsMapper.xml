@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.he.order.mapper.InvInventoryItemsMapper">
+    <resultMap id="BaseResultMap" type="com.he.order.dto.InvInventoryItems">
+        <result column="INVENTORY_ITEM_ID" property="inventoryItemId" jdbcType="DECIMAL" />
+        <result column="ITEM_CODE" property="itemCode" jdbcType="VARCHAR" />
+        <result column="ITEM_UOM" property="itemUom" jdbcType="VARCHAR" />
+        <result column="ITEM_DESCRIPTION" property="itemDescription" jdbcType="VARCHAR" />
+        <result column="ORDER_FLAG" property="orderFlag" jdbcType="VARCHAR" />
+        <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="DATE" />
+        <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="DATE" />
+        <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+    </resultMap>
+    <select id="lovInvInventoryItems" parameterType="com.he.order.dto.InvInventoryItems" resultMap="BaseResultMap">
+        select INVENTORY_ITEM_ID,ITEM_CODE,ITEM_DESCRIPTION,ORDER_FLAG,START_ACTIVE_DATE,END_ACTIVE_DATE,ENABLED_FLAG
+        from HAP_INV_INVENTORY_ITEMS
+        <where>
+            <if test="itemCode != null">
+                and ITEM_CODE like concat(concat('%',UPPER(#{itemCode,jdbcType=VARCHAR})),'%')
+            </if>
+            <if test="itemDescription != null">
+                and ITEM_DESCRIPTION like concat(concat('%',UPPER(#{itemDescription,jdbcType=VARCHAR})),'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="lovInvInventoryItemsForOrderLines" parameterType="com.he.order.dto.InvInventoryItems" resultMap="BaseResultMap">
+        select INVENTORY_ITEM_ID,ITEM_CODE,ITEM_DESCRIPTION,ITEM_UOM,ORDER_FLAG,START_ACTIVE_DATE,END_ACTIVE_DATE,ENABLED_FLAG
+        from HAP_INV_INVENTORY_ITEMS
+        where ORDER_FLAG='Y' AND ENABLED_FLAG='Y'
+            <if test="itemCode != null">
+                and ITEM_CODE like concat(concat('%',UPPER(#{itemCode,jdbcType=VARCHAR})),'%')
+            </if>
+            <if test="itemDescription != null">
+                and ITEM_DESCRIPTION like concat(concat('%',UPPER(#{itemDescription,jdbcType=VARCHAR})),'%')
+            </if>
+    </select>
+</mapper>

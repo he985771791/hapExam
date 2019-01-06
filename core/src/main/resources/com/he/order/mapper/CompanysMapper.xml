@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.he.order.mapper.CompanysMapper">
+    <resultMap id="BaseResultMap" type="com.he.order.dto.Companys">
+        <result column="COMPANY_ID" property="companyId" jdbcType="DECIMAL" />
+        <result column="COMPANY_NUMBER" property="companyNumber" jdbcType="VARCHAR" />
+        <result column="COMPANY_NAME" property="companyName" jdbcType="VARCHAR" />
+        <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+    </resultMap>
+    <select id="lovCompanys" parameterType="com.he.order.dto.Companys" resultMap="BaseResultMap">
+        select COMPANY_ID,COMPANY_NUMBER,COMPANY_NAME,ENABLED_FLAG from HAP_ORG_COMPANYS
+        <where>
+            <if test="companyNumber != null">
+                and COMPANY_NUMBER like concat(concat('%',UPPER(#{companyNumber,jdbcType=VARCHAR})),'%')
+            </if>
+            <if test="companyName != null">
+                and COMPANY_NAME like concat(concat('%',UPPER(#{companyName,jdbcType=VARCHAR})),'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="lovCompanysForOrderLines" parameterType="com.he.order.dto.Companys" resultMap="BaseResultMap">
+        select COMPANY_ID,COMPANY_NUMBER,COMPANY_NAME,ENABLED_FLAG from HAP_ORG_COMPANYS
+        where ENABLED_FLAG='Y'
+            <if test="companyNumber != null">
+                and COMPANY_NUMBER like concat(concat('%',UPPER(#{companyNumber,jdbcType=VARCHAR})),'%')
+            </if>
+            <if test="companyName != null">
+                and COMPANY_NAME like concat(concat('%',UPPER(#{companyName,jdbcType=VARCHAR})),'%')
+            </if>
+    </select>
+</mapper>

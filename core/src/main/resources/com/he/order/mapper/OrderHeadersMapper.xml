@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.he.order.mapper.OrderHeadersMapper">
+    <resultMap id="BaseResultMap" type="com.he.order.dto.OrderHeaders">
+        <result column="HEADER_ID" property="headerId" jdbcType="DECIMAL" />
+        <result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />
+        <result column="COMPANY_ID" property="companyId" jdbcType="DECIMAL" />
+        <result column="ORDER_DATE" property="orderDate" jdbcType="DATE" />
+        <result column="ORDER_STATUS" property="orderStatus" jdbcType="VARCHAR" />
+        <result column="CUSTOMER_ID" property="customerId" jdbcType="DECIMAL" />
+    </resultMap>
+
+    <select id="selectCollect" resultMap="BaseResultMap" parameterType="com.he.order.dto.OrderHeaders">
+        SELECT
+            h.header_id AS headerId,
+            h.order_number AS orderNumber,
+            h.order_date AS orderDate,
+            h.order_status AS orderStatus,
+            c.company_id AS companyId,
+            c.company_name AS companyName,
+            cu.customer_id AS customerId,
+            cu.customer_name AS customerName,
+            (SELECT sum(ORDERD_QUANTITY * UNIT_SELLING_PRICE)
+                FROM hap_om_order_lines line
+                WHERE header_id = h.HEADER_ID) AS total
+        FROM
+            hap_om_order_headers h,
+            hap_ar_customers cu,
+            hap_org_companys c
+        WHERE
+            h.customer_id = cu.customer_id
+            AND h.company_id = c.company_id
+            <if test="companyId != null">
+                and h.company_id = #{companyId}
+            </if>
+            <if test="customerId != null">
+                and h.customer_id = #{customerId}
+            </if>
+            <if test="orderNumber != null">
+                and h.order_number= #{orderNumber}
+            </if>
+            <if test="orderStatus != null">
+                and h.order_status = #{orderStatus}
+            </if>
+            <if test="headerId !=null">
+                and h.header_id  = #{headerId}
+            </if>
+            <if test="inventoryItemId != null">
+                and h.header_id in (SELECT
+                l.header_id
+                FROM
+                hap_om_order_lines l
+                WHERE
+                l.INVENTORY_ITEM_ID = #{inventoryItemId})
+            </if>
+    </select>
+
+    <delete id="deleteHeaderAndLines" parameterType="com.he.order.dto.OrderHeaders">
+        DELETE hap_om_order_headers,
+         hap_om_order_lines
+        FROM
+            hap_om_order_headers
+        LEFT JOIN hap_om_order_lines ON hap_om_order_headers.HEADER_ID = hap_om_order_lines.HEADER_ID
+        WHERE
+            hap_om_order_headers.HEADER_ID = #{headerId}
+    </delete>
+</mapper>
